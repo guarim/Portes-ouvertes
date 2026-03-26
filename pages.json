@@ -1,0 +1,150 @@
+{
+  "pages": [
+    {
+      "id": "index",
+      "file": "index.html",
+      "title": "Bienvenue au Lycée Professionnel Jules Verne !",
+      "type": "accueil",
+      "background": "images/home.png",
+      "autoRedirect": { "to": "formations.html", "delay": 20000 },
+      "text": "Notre Lycée bénéficie d'un emplacement idéal : à la fois proche du centre-ville d'Étaples, de la mer, de la gare, des équipements sportifs et du bois de Rombly, tout est réuni pour que nos élèves et nos personnels puissent s'épanouir dans un environnement agréable.\n\nDe la 3ème Prépa-métiers jusqu'au Bac professionnel, en passant par le CAP, nos formations s'adressent à la fois à des élèves en formation initiale, des apprentis sous la bannière du CFA académique ou à des adultes en formation continue à travers le GRETA grand Littoral.\n\nPréparant aux métiers du bâtiment, nos formations sont assurées par des équipes motivées, investies et expérimentées, très attachées à la réussite de chaque apprenant."
+    },
+    {
+      "id": "formations",
+      "file": "formations.html",
+      "title": "Les formations du lycée",
+      "type": "gallery",
+      "layout": { "rows": 3, "cols": 2 },
+      "images": [
+        { "src": "images/1.png", "alt": "Formation 1", "link": "f1.html" },
+        { "src": "images/2.png", "alt": "Formation 2", "link": "f2.html" },
+        { "src": "images/3.png", "alt": "Formation 3", "link": "f3.html" },
+        { "src": "images/4.png", "alt": "Formation 4", "link": "f4.html" },
+        { "src": "images/5.png", "alt": "Formation 5", "link": "f5.html" },
+        { "src": "images/6.png", "alt": "Formation 6", "link": "f6.html" }
+      ]
+    },
+    {
+      "id": "f1",
+      "file": "f1.html",
+      "title": "Métiers de l'Électricité et de ses Environnements Connectés",
+      "type": "detail",
+      "image": { "src": "images/f11.png", "alt": "Électricité", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/Iw9_mKCaRLI" }
+    },
+    {
+      "id": "f2",
+      "file": "f2.html",
+      "title": "Métiers de l'agencement, de la menuiserie et de l'ameublement",
+      "type": "gallery",
+      "layout": { "rows": 2, "cols": 2 },
+      "images": [
+        { "src": "images/f21.png", "alt": "CAP Menuisier Installateur", "link": "f21.html" },
+        { "src": "images/f22.png", "alt": "CAP Menuiserie Aluminium Verre", "link": "f22.html" },
+        { "src": "images/f23.png", "alt": "BAC PRO Technicien Menuisier Agenceur", "link": "f23.html" },
+        { "src": "images/f24.png", "alt": "BAC PRO Technicien Menuiserie Aluminium Verre", "link": "f24.html" }
+      ]
+    },
+    {
+      "id": "f21",
+      "file": "f21.html",
+      "title": "CAP – Menuisier Installateur",
+      "type": "detail",
+      "image": { "src": "images/f211.png", "alt": "CAP Menuisier", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/KyVTGlRN6MI" }
+    },
+    {
+      "id": "f22",
+      "file": "f22.html",
+      "title": "CAP – Menuiserie Aluminium Verre",
+      "type": "detail",
+      "image": { "src": "images/f221.png", "alt": "CAP Menuiserie Alu", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/FYQUCT0jEZo" }
+    },
+    {
+      "id": "f23",
+      "file": "f23.html",
+      "title": "BAC PRO – Technicien Menuisier Agenceur",
+      "type": "detail",
+      "image": { "src": "images/f231.png", "alt": "BAC PRO Menuisier", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/fOTJC6FeWWA" }
+    },
+    {
+      "id": "f24",
+      "file": "f24.html",
+      "title": "BAC PRO – Technicien Menuisier Aluminium Verre",
+      "type": "detail",
+      "image": { "src": "images/f241.png", "alt": "BAC PRO Alu", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/FYQUCT0jEZo" }
+    },
+    {
+      "id": "f3",
+      "file": "f3.html",
+      "title": "Métiers du Bâtiment – Gros Œuvre et Finitions",
+      "type": "gallery",
+      "layout": { "rows": 2, "cols": 2 },
+      "images": [
+        { "src": "images/f31.png", "alt": "CAP Maçon", "link": "f31.html" },
+        { "src": "images/f32.png", "alt": "CAP Peintre", "link": "f32.html" },
+        { "src": "images/f33.png", "alt": "BAC PRO Aménagement", "link": "f33.html" },
+        { "src": "images/f34.png", "alt": "Titre Pro Peintre Façadier", "link": "f34.html" }
+      ]
+    },
+    {
+      "id": "f31",
+      "file": "f31.html",
+      "title": "CAP Maçon",
+      "type": "detail",
+      "image": { "src": "images/f311.png", "alt": "CAP Maçon", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/jZpYZY9CrjM" }
+    },
+    {
+      "id": "f32",
+      "file": "f32.html",
+      "title": "CAP Peintre Applicateur de Revêtement",
+      "type": "detail",
+      "image": { "src": "images/f321.png", "alt": "CAP Peintre", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/KyVTGlRN6MI" }
+    },
+    {
+      "id": "f33",
+      "file": "f33.html",
+      "title": "BAC PRO – Aménagement et Finition du Bâtiment",
+      "type": "detail",
+      "image": { "src": "images/f331.png", "alt": "BAC PRO Aménagement", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/zME9W0q09Mc" }
+    },
+    {
+      "id": "f34",
+      "file": "f34.html",
+      "title": "Titre Pro – Peintre Façadier, Isolation Extérieure",
+      "type": "detail",
+      "image": { "src": "images/f341.png", "alt": "Peintre Façadier", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/KyVTGlRN6MI" }
+    },
+    {
+      "id": "f4",
+      "file": "f4.html",
+      "title": "3ème Prépa-Métiers",
+      "type": "detail",
+      "image": { "src": "images/f411.png", "alt": "Prépa Métiers", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/PvdrUBnD7Ys" }
+    },
+    {
+      "id": "f5",
+      "file": "f5.html",
+      "title": "CAP – Interventions en Maintenance Technique du Bâtiment",
+      "type": "detail",
+      "image": { "src": "images/f511.png", "alt": "Maintenance Bâtiment", "clickable": false },
+      "video": { "youtube": "https://www.youtube.com/embed/M37BHq3Feyc" }
+    },
+    {
+      "id": "f6",
+      "file": "f6.html",
+      "title": "CDI",
+      "type": "single-image",
+      "image": { "src": "images/f51.png", "alt": "CDI", "clickable": true, "link": "https://lp-lyc-metier-jules-verne-etaples.62.ac-lille.fr/category/cdi/", "external": true },
+      "video": { "youtube": "https://www.youtube.com/embed/RyIEJJKIbnk" }
+    }
+  ]
+}
