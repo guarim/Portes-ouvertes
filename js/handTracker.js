@@ -24,7 +24,7 @@ const HandTracker = (() => {
   const CURSOR_SMOOTH        = 0.28;
   const FIST_FRAMES_NEEDED   = 14;
   const GESTURE_COOLDOWN_MS  = 800;
-  const DWELL_DURATION_MS    = 3000;
+  const DWELL_DURATION_MS    = 2000;
   const DWELL_MOVE_TOLERANCE = 28;   // px max de mouvement toléré pendant le dwell
 
   /* ══════════════════════════════════════════════════════════
