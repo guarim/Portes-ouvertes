@@ -19,22 +19,33 @@ function findPage(config, filename) {
 
 /* ── Éléments communs de toute page ──────────────────────── */
 function injectCommonElements() {
-  // Curseur main
-  let cursor = document.getElementById('hand-cursor');
-  if (!cursor) {
-    cursor = document.createElement('div');
+  // Curseur main avec anneau dwell SVG
+  if (!document.getElementById('hand-cursor')) {
+    const cursor = document.createElement('div');
     cursor.id = 'hand-cursor';
+    cursor.innerHTML = `
+      <div class="cursor-ring"></div>
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <circle class="dwell-track" cx="24" cy="24" r="21"/>
+        <circle class="dwell-fill"  cx="24" cy="24" r="21"
+          stroke-dasharray="132" stroke-dashoffset="132"/>
+      </svg>
+      <div class="cursor-dot"></div>
+    `;
     document.body.appendChild(cursor);
   }
   // Vidéo + canvas webcam
-  ['webcam-video','webcam-canvas'].forEach(id => {
-    if (!document.getElementById(id)) {
-      const el = document.createElement(id === 'webcam-video' ? 'video' : 'canvas');
-      el.id = id; el.width = 200; el.height = 113;
-      if (id === 'webcam-video') { el.autoplay = true; el.playsInline = true; el.muted = true; }
-      document.body.appendChild(el);
-    }
-  });
+  if (!document.getElementById('webcam-video')) {
+    const v = document.createElement('video');
+    v.id = 'webcam-video'; v.width = 200; v.height = 113;
+    v.autoplay = true; v.playsInline = true; v.muted = true;
+    document.body.appendChild(v);
+  }
+  if (!document.getElementById('webcam-canvas')) {
+    const c = document.createElement('canvas');
+    c.id = 'webcam-canvas'; c.width = 200; c.height = 113;
+    document.body.appendChild(c);
+  }
   // Status
   if (!document.getElementById('hand-status')) {
     const s = document.createElement('div');
@@ -240,6 +251,7 @@ function renderSingleImage(page) {
    ================================================================ */
 function setupHandTracker(pageType) {
 
+  /* ── Sélecteur des éléments cliquables selon le type de page ── */
   const clickableSelector = (() => {
     if (pageType === 'gallery')      return '.galerie-item';
     if (pageType === 'single-image') return '.single-image-wrapper';
@@ -247,75 +259,91 @@ function setupHandTracker(pageType) {
     return null;
   })();
 
-  /* Hover visuel via curseur main */
+  /* ── Hover visuel : classe CSS quand le curseur survole ── */
   function onCursorMove(x, y, visible) {
     if (!clickableSelector) return;
-    const items = document.querySelectorAll(clickableSelector);
-    items.forEach(el => {
+    document.querySelectorAll(clickableSelector).forEach(el => {
       if (!visible) { el.classList.remove('hovered'); return; }
       const r = el.getBoundingClientRect();
-      const inside = x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
-      el.classList.toggle('hovered', inside);
+      el.classList.toggle('hovered',
+        x >= r.left && x <= r.right && y >= r.top && y <= r.bottom);
     });
   }
 
-  /* Pinch → action sur l'élément sous le curseur */
-  function onPinchImage(x, y) {
-    if (!clickableSelector) return;
-    const items = document.querySelectorAll(clickableSelector);
-    for (const el of items) {
-      const r = el.getBoundingClientRect();
-      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-        if (el.dataset.link) {
-          const ext = el.dataset.external === '1';
-          if (ext) window.open(el.dataset.link, '_blank');
-          else window.location.href = el.dataset.link;
-        } else if (el.id === 'video-side') {
-          el.click();
-        }
-        break;
-      }
+  /* ── Dwell fire : action sur l'élément fourni ── */
+  function onDwellFire(x, y, el) {
+    if (!el) return;
+    // Galerie / single-image : suivre dataset.link
+    if (el.dataset.link) {
+      if (el.dataset.external === '1') window.open(el.dataset.link, '_blank');
+      else window.location.href = el.dataset.link;
+    }
+    // Page détail : ouvrir la vidéo
+    else if (el.id === 'video-side') {
+      el.click();
     }
   }
 
-  /* Zoom gestuel (deux mains) */
-  let zoomedEl = null;
-  function onZoomChange(zoom) {
+  /* ── Zoom + Pan gestuel (deux mains pinch bilatéral) ── */
+  let zoomedEl  = null;
+  let lastZoom  = 1.0;
+
+  function applyZoomPan(el, zoom, ox, oy) {
+    if (!el) return;
+    if (zoom <= 1.01) {
+      el.style.transform  = '';
+      el.style.zIndex     = '';
+      el.classList.remove('gesture-zoomed');
+    } else {
+      // transform-origin centre, puis translate pour le pan
+      el.style.transformOrigin = 'center center';
+      el.style.transform  = `scale(${zoom}) translate(${ox / zoom}px, ${oy / zoom}px)`;
+      el.style.zIndex     = '20';
+      el.classList.add('gesture-zoomed');
+    }
+  }
+
+  function onZoomPan(zoom, ox, oy) {
+    lastZoom = zoom;
+
     if (pageType === 'gallery') {
-      // Zoom sur l'image survolée ou la première visible
-      const hovered = document.querySelector('.galerie-item.hovered') ||
-                      document.querySelector('.galerie-item');
-      if (!hovered) return;
-      if (zoomedEl && zoomedEl !== hovered) {
-        zoomedEl.style.transform = '';
-        zoomedEl.style.zIndex    = '';
+      // Cible = image survolée ou première de la grille
+      const target = document.querySelector('.galerie-item.hovered')
+                  || document.querySelector('.galerie-item');
+      if (!target) return;
+      // Si on change de cible → reset l'ancienne
+      if (zoomedEl && zoomedEl !== target) {
+        applyZoomPan(zoomedEl, 1, 0, 0);
       }
-      zoomedEl = hovered;
-      if (zoom <= 1.01) {
-        hovered.style.transform = '';
-        hovered.style.zIndex    = '';
-      } else {
-        hovered.style.transform = `scale(${zoom})`;
-        hovered.style.zIndex    = '20';
-      }
+      zoomedEl = target;
+      applyZoomPan(target, zoom, ox, oy);
+
     } else if (pageType === 'detail') {
       const img = document.querySelector('.detail-image-side img');
       if (!img) return;
-      img.style.transform = zoom <= 1.01 ? '' : `scale(${zoom})`;
+      zoomedEl = img;
+      applyZoomPan(img, zoom, ox, oy);
+
     } else if (pageType === 'single-image') {
       const w = document.querySelector('.single-image-wrapper');
       if (!w) return;
-      w.style.transform = zoom <= 1.01 ? '' : `scale(${zoom})`;
+      zoomedEl = w;
+      applyZoomPan(w, zoom, ox, oy);
     }
-    HandTracker.showToast(zoom <= 1.01 ? '🔍 Zoom réinitialisé' : `🔍 Zoom ×${zoom.toFixed(1)}`);
   }
 
-  /* Poing → retour */
+  /* ── Retour arrière ── */
   function onGoBack() {
     history.back();
   }
 
-  HandTracker.init({ onCursorMove, onPinchImage, onZoomChange, onGoBack });
+  HandTracker.init({
+    clickableSelector,
+    onCursorMove,
+    onDwellFire,
+    onZoomPan,
+    onGoBack
+  });
 }
 
 /* ================================================================

@@ -39,20 +39,61 @@ html, body {
    ============================================================ */
 #hand-cursor {
   position: fixed;
-  width: 36px; height: 36px;
-  border: 3px solid var(--gold);
-  border-radius: 50%;
-  background: rgba(232,160,32,0.18);
+  width: 48px; height: 48px;
   pointer-events: none;
   transform: translate(-50%, -50%);
   z-index: 9999;
   display: none;
-  transition: transform 0.08s ease, background 0.15s ease;
-  box-shadow: 0 0 12px var(--gold), 0 0 28px rgba(232,160,32,0.4);
 }
-#hand-cursor.pinch {
-  background: rgba(232,160,32,0.6);
-  transform: translate(-50%,-50%) scale(0.7);
+/* Anneau extérieur fixe */
+#hand-cursor .cursor-ring {
+  position: absolute; inset: 0;
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  background: rgba(232,160,32,0.12);
+  box-shadow: 0 0 10px var(--gold), 0 0 24px rgba(232,160,32,0.35);
+}
+/* SVG de progression (dwell timer) */
+#hand-cursor svg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+#hand-cursor circle.dwell-track {
+  fill: none;
+  stroke: rgba(232,160,32,0.15);
+  stroke-width: 3;
+}
+#hand-cursor circle.dwell-fill {
+  fill: none;
+  stroke: var(--gold-light);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 132; /* 2π×21 ≈ 132 */
+  stroke-dashoffset: 132;
+  transition: stroke-dashoffset 0.05s linear;
+  filter: drop-shadow(0 0 3px var(--gold));
+}
+/* Point central */
+#hand-cursor .cursor-dot {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px; height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 6px var(--gold);
+}
+/* État : survol actif (dwell en cours) */
+#hand-cursor.dwelling .cursor-ring {
+  background: rgba(232,160,32,0.25);
+  border-color: var(--gold-light);
+}
+/* État : action déclenchée */
+#hand-cursor.fired .cursor-ring {
+  background: rgba(232,160,32,0.7);
+  transform: scale(0.6);
+  transition: transform 0.2s, background 0.2s;
 }
 
 /* ============================================================
@@ -223,58 +264,105 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: linear-gradient(160deg, var(--blue-dark) 0%, #0c1f45 100%);
 }
 .galerie-grid-wrapper {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 90px 40px 24px;
+  /* Padding top = hauteur header, padding bas = marge webcam */
+  padding: 78px 36px 18px;
+  min-height: 0;
 }
 .galerie-grid {
   display: grid;
-  gap: 20px;
+  /* gap serré pour tout faire tenir */
+  gap: 14px;
+  /* La grille n'excède jamais la zone visible */
   width: 100%;
   height: 100%;
+  max-width: 1840px;
+  max-height: 940px;
 }
-/* Layouts dynamiques via JS */
-.galerie-grid.cols-2.rows-2 { grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(2,1fr); }
-.galerie-grid.cols-2.rows-3 { grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr); }
+/* ── Layouts fixes, calculés pour 1920×1080 ── */
+/* 2 colonnes × 3 lignes  (page formations : 6 images) */
+.galerie-grid.cols-2.rows-3 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows:    repeat(3, minmax(0, 1fr));
+}
+/* 2 colonnes × 2 lignes  (sous-pages : 4 images) */
+.galerie-grid.cols-2.rows-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows:    repeat(2, minmax(0, 1fr));
+}
 
+/* ── Carte image ── */
 .galerie-item {
   position: relative;
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: visible;          /* overflow visible pour que le scale ne soit pas clippé */
   cursor: pointer;
   border: 2px solid var(--card-border);
   background: var(--card-bg);
-  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  /* transition douce, pas de transform par défaut */
+  transition: box-shadow var(--transition), border-color var(--transition);
   box-shadow: var(--shadow);
 }
-.galerie-item img {
+/* clip interne séparé sur l'img pour que le scale ne déborde pas */
+.galerie-item > img {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: calc(var(--radius) - 2px);
   transition: transform var(--transition);
 }
 .galerie-item .item-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(180deg, transparent 50%, rgba(10,22,40,0.85) 100%);
+  border-radius: calc(var(--radius) - 2px);
+  background: linear-gradient(180deg, transparent 40%, rgba(10,22,40,0.88) 100%);
   opacity: 0;
   transition: opacity var(--transition);
+  pointer-events: none;
 }
-.galerie-item:hover .item-overlay,
 .galerie-item.hovered .item-overlay { opacity: 1; }
 
-.galerie-item.hovered,
+/* Hover léger au survol souris classique */
 .galerie-item:hover {
-  transform: scale(1.04);
   border-color: var(--gold);
-  box-shadow: 0 12px 50px rgba(232,160,32,0.3), var(--shadow);
+  box-shadow: 0 8px 32px rgba(232,160,32,0.2), var(--shadow);
 }
-.galerie-item.zoomed-gesture {
-  transform: scale(var(--zoom, 1));
-  z-index: 10;
+/* Hover gestuel (main) : zoom légèrement l'image à l'intérieur */
+.galerie-item.hovered {
+  border-color: var(--gold);
+  box-shadow: 0 12px 50px rgba(232,160,32,0.35), var(--shadow);
+  z-index: 5;
+}
+.galerie-item.hovered > img {
+  transform: scale(1.06);
+}
+
+/* ── Anneau de progression "hover 5s" autour de la carte ── */
+.galerie-item .hover-ring {
+  position: absolute; inset: -5px;
+  border-radius: calc(var(--radius) + 4px);
+  pointer-events: none;
+  z-index: 6;
+  /* SVG stroke-dashoffset géré en JS */
+}
+.galerie-item .hover-ring svg {
+  width: 100%; height: 100%;
+  position: absolute; inset: 0;
+}
+
+/* ── Zoom gestuel (deux mains) : appliqué via JS inline style ── */
+.galerie-item.gesture-zoomed {
+  z-index: 20;
+  /* transform et translate injectés en inline style par JS */
+  border-color: var(--gold-light);
+  box-shadow: 0 20px 80px rgba(232,160,32,0.5);
+  /* désactiver la transition pendant le zoom pour fluidité */
+  transition: box-shadow var(--transition), border-color var(--transition);
 }
 
 /* ============================================================
