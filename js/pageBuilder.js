@@ -174,13 +174,13 @@ function renderDetail(page) {
           </div>
           <span class="play-label">Cliquer pour lancer la vidéo</span>
         </div>
-        <iframe id="yt-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="yt-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ></iframe>
       </div>
     </div>
     <!-- Overlay plein écran vidéo -->
     <div class="video-fullscreen-overlay" id="video-overlay">
       <button class="close-video-btn" id="close-video">✕</button>
-      <iframe id="yt-fullscreen" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <iframe id="yt-fullscreen" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ></iframe>
     </div>
   `;
   document.body.prepend(wrap);
