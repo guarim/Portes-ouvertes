@@ -301,18 +301,22 @@ html, body {
 .galerie-item {
   position: relative;
   border-radius: var(--radius);
-  overflow: visible;          /* overflow visible pour que le scale ne soit pas clippé */
+  overflow: visible;
   cursor: pointer;
   border: 2px solid var(--card-border);
-  background: var(--card-bg);
-  /* transition douce, pas de transform par défaut */
+  /* Fond sombre visible derrière l'image en contain */
+  background: #07111f;
   transition: box-shadow var(--transition), border-color var(--transition);
   box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-/* clip interne séparé sur l'img pour que le scale ne déborde pas */
+/* L'image s'affiche entièrement dans son cadre, sans rognage */
 .galerie-item > img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   display: block;
   border-radius: calc(var(--radius) - 2px);
   transition: transform var(--transition);
@@ -382,20 +386,30 @@ html, body {
   gap: 28px;
   padding: 90px 44px 28px;
   min-height: 0;
+  align-items: center;
 }
+
+/* ── Côté image gauche : contenu entier visible ── */
 .detail-image-side {
   position: relative;
   border-radius: var(--radius);
   overflow: hidden;
   border: 2px solid var(--card-border);
-  background: var(--card-bg);
+  background: #07111f;
   box-shadow: var(--shadow);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .detail-image-side img {
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;        /* image entière, sans rognage */
+  object-position: center;
   display: block;
 }
+
+/* ── Côté vidéo droit : ratio 16:9 natif, centré ── */
 .detail-video-side {
   position: relative;
   border-radius: var(--radius);
@@ -404,7 +418,15 @@ html, body {
   background: #000;
   box-shadow: var(--shadow);
   cursor: pointer;
+  /* Le conteneur adopte le ratio 16:9 et se centre verticalement */
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  align-self: center;
+  /* Hauteur max pour ne pas dépasser la zone disponible */
+  max-height: calc(100vh - 120px);
 }
+
+/* Placeholder affiché avant lecture */
 .detail-video-side .video-placeholder {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
@@ -413,8 +435,13 @@ html, body {
   gap: 16px;
   transition: opacity var(--transition);
   z-index: 2;
+  border-radius: var(--radius);
 }
-.detail-video-side.playing .video-placeholder { opacity: 0; pointer-events: none; }
+.detail-video-side.playing .video-placeholder {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .play-icon {
   width: 72px; height: 72px;
   border-radius: 50%;
@@ -427,42 +454,17 @@ html, body {
 .detail-video-side:hover .play-icon { transform: scale(1.1); background: rgba(232,160,32,0.35); }
 .play-label { color: var(--text-light); font-size: 0.9rem; letter-spacing: 0.07em; }
 
+/* iframe YouTube inline — remplit tout le conteneur 16:9 */
 .detail-video-side iframe {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   border: none;
+  border-radius: calc(var(--radius) - 2px);
   z-index: 1;
   opacity: 0;
   transition: opacity 0.3s;
 }
 .detail-video-side.playing iframe { opacity: 1; }
-
-/* Fullscreen vidéo */
-.video-fullscreen-overlay {
-  position: fixed; inset: 0;
-  background: #000;
-  z-index: 5000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-.video-fullscreen-overlay.active { display: flex; }
-.video-fullscreen-overlay iframe { width: 100vw; height: 100vh; border: none; }
-.video-fullscreen-overlay .close-video-btn {
-  position: fixed;
-  top: 20px; right: 24px;
-  z-index: 5001;
-  background: rgba(232,160,32,0.2);
-  border: 2px solid var(--gold);
-  color: var(--gold);
-  font-size: 1.5rem;
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: var(--transition);
-}
-.video-fullscreen-overlay .close-video-btn:hover { background: var(--gold); color: var(--blue-dark); }
 
 /* ============================================================
    PAGE IMAGE UNIQUE (CDI)
