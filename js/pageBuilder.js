@@ -159,6 +159,7 @@ function renderDetail(page) {
   wrap.id = 'page-detail';
 
   const videoSrc = page.video.youtube;
+  const autoplay = videoSrc + '?autoplay=1&rel=0&modestbranding=1';
 
   wrap.innerHTML = `
     <div class="detail-body fade-in">
@@ -172,48 +173,44 @@ function renderDetail(page) {
               <path d="M8 5v14l11-7z"/>
             </svg>
           </div>
-          <span class="play-label">Cliquer pour lancer la vidéo</span>
+          <span class="play-label">Pointer 5s pour lancer la vidéo</span>
         </div>
-        <iframe id="yt-iframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ></iframe>
+        <iframe id="yt-iframe"
+          src=""
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
       </div>
-    </div>
-    <!-- Overlay plein écran vidéo -->
-    <div class="video-fullscreen-overlay" id="video-overlay">
-      <button class="close-video-btn" id="close-video">✕</button>
-      <iframe id="yt-fullscreen" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ></iframe>
     </div>
   `;
   document.body.prepend(wrap);
   document.body.insertBefore(buildHeader(page.title, true), wrap);
 
-  // Gestion vidéo
   const videoSide = document.getElementById('video-side');
   const iframe    = document.getElementById('yt-iframe');
-  const overlay   = document.getElementById('video-overlay');
-  const fsIframe  = document.getElementById('yt-fullscreen');
-  const closeBtn  = document.getElementById('close-video');
 
-  const autoplay = videoSrc + '?autoplay=1&rel=0&enablejsapi=1';
-
+  // Lecture directement dans le conteneur (pas de plein écran)
   function openVideo() {
-    fsIframe.src = autoplay;
-    overlay.classList.add('active');
-  }
-  function closeVideo() {
-    fsIframe.src = '';
-    overlay.classList.remove('active');
-    videoSide.classList.remove('playing');
-    iframe.src = '';
+    if (videoSide.classList.contains('playing')) {
+      // Deuxième clic → arrêt
+      iframe.src = '';
+      videoSide.classList.remove('playing');
+    } else {
+      iframe.src = autoplay;
+      videoSide.classList.add('playing');
+    }
   }
 
   videoSide.addEventListener('click', openVideo);
-  closeBtn.addEventListener('click', closeVideo);
 
-  // Fermeture si iframe envoie message de fin (postMessage YouTube)
+  // Fin de lecture YouTube → retour au placeholder
   window.addEventListener('message', (e) => {
     try {
       const data = JSON.parse(e.data);
-      if (data.event === 'onStateChange' && data.info === 0) closeVideo(); // 0 = ended
+      if (data.event === 'onStateChange' && data.info === 0) {
+        iframe.src = '';
+        videoSide.classList.remove('playing');
+      }
     } catch {}
   });
 }

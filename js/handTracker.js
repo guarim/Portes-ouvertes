@@ -19,12 +19,12 @@ const HandTracker = (() => {
      CONFIG
   ══════════════════════════════════════════════════════════ */
   const PINCH_DIST_THRESHOLD = 0.075;
-  const ZOOM_MAX             = 6.5;
+  const ZOOM_MAX             = 3.5;
   const ZOOM_MIN             = 1.0;
   const CURSOR_SMOOTH        = 0.28;
-  const FIST_FRAMES_NEEDED   = 10;
-  const GESTURE_COOLDOWN_MS  = 600;
-  const DWELL_DURATION_MS    = 1500;
+  const FIST_FRAMES_NEEDED   = 14;
+  const GESTURE_COOLDOWN_MS  = 800;
+  const DWELL_DURATION_MS    = 5000;
   const DWELL_MOVE_TOLERANCE = 28;   // px max de mouvement toléré pendant le dwell
 
   /* ══════════════════════════════════════════════════════════
@@ -103,7 +103,7 @@ const HandTracker = (() => {
      INIT MEDIAPIPE
   ══════════════════════════════════════════════════════════ */
   async function initMediaPipe() {
-    const vision = await import( 
+    const vision = await import(
       'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs'
     );
     const { HandLandmarker, FilesetResolver } = vision;
