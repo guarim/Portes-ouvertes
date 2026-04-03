@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Lycée Jules Verne</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!--
+    MediaPipe chargé en <script> synchrone AVANT les moteurs.
+    Ceci expose window.Hands et window.Camera globalement.
+    NE PAS utiliser de dynamic import() sur ces libs — incompatible avec ce mode de chargement.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.js"
+          crossorigin="anonymous"></script>
+</head>
+<body>
+
+<!-- Contenu principal (rempli par PageEngine selon pages.json) -->
+<div id="app">
+  <div id="page-content"></div>
+</div>
+
+<!-- Indicateur de zoom (affiché brièvement lors du zoom gestuel) -->
+<div id="zoom-indicator">🔍 100%</div>
+
+<!-- Guide des gestes (coin supérieur gauche) -->
+<div id="gesture-guide">
+  <h4>Gestes</h4>
+  <div class="gesture-item">
+    <span class="gesture-icon">👌</span>
+    <span class="gesture-desc">Pincer main droite sur image → ouvrir</span>
+  </div>
+  <div class="gesture-item">
+    <span class="gesture-icon">🤏🤏</span>
+    <span class="gesture-desc">Deux mains : écarter/rapprocher → zoom</span>
+  </div>
+  <div class="gesture-item">
+    <span class="gesture-icon">✊</span>
+    <span class="gesture-desc">Poing fermé → page précédente</span>
+  </div>
+</div>
+
+<!-- Caméra (miniature en bas à droite, toujours visible une fois active) -->
+<div id="gesture-layer">
+  <span id="gesture-status">⏳ Démarrage de la caméra…</span>
+  <div style="position:relative;display:inline-block;">
+    <video id="gesture-video" autoplay playsinline muted></video>
+    <canvas id="gesture-canvas"></canvas>
+  </div>
+</div>
+
+<!-- Moteurs (dans l'ordre : engine gestes PUIS engine page) -->
+<script src="gesture-engine.js"></script>
+<script src="pageBuilder.js"></script>
+
+<script>
+  // Démarrage immédiat dès que le DOM est prêt
+  document.addEventListener('DOMContentLoaded', async () => {
+    const engine = new PageEngine();
+    await engine.init();
+  });
+</script>
+
+</body>
+</html>
